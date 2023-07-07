@@ -1,0 +1,253 @@
+<?xml version='1.0'?>
+<robot name="car" xmlns:xacro="http://ros.org/wiki/xacro" >
+
+   
+   <!-- Base_Link -->
+   
+    <link name='chassis'>
+    	<inertial>
+      	  <mass value="10.7"/>
+      	  <origin xyz="0 0 0"/>
+      	  <inertia ixx="10.0" ixy="10.0" ixz="10.0" iyy="10.0" iyz="10.0" izz="100.0" />
+    	</inertial>
+    
+    	<visual>
+      	  <origin xyz="0.61 0.33 0.1" rpy="0 0.4 3.14"/>
+      	    <geometry>
+        	<!--<box size ="0.33 0.42 0.05"/>-->
+        	    <mesh filename="package://slam/meshes/ateks2.stl" scale="0.001 0.001 0.001"/>
+      	    </geometry>
+        <!-- <origin xyz="0 0 0.2" rpy="0 0 0" /> -->
+        <!-- <geometry> -->
+	<!--   <box size="1.1 0.5 0.1"/> -->
+        <!-- </geometry> -->
+    	</visual>
+    	
+    	<collision>
+      	   <origin rpy="0 0 0" xyz="0 0 0.2"/>
+      	    <geometry>
+        	    <box size ="1.08 0.6 0.1"/>
+      	    </geometry>
+    	</collision> 
+     </link>
+     
+     <gazebo reference="chassis">
+    	<material value="Gazebo/DarkGrey "/>
+     </gazebo>
+     
+  <!-- Caster Wheels -->
+    <link name='left_caster_wheel'>
+    	<collision>
+      	   <origin rpy="0 0 0" xyz="0.33884 -0.27 0.075"/>
+      	    <geometry>
+      	        <sphere radius ="0.075"/>
+      	    </geometry>
+    	</collision>   
+     </link>
+     
+     <joint name="left_caster_joint" type="fixed">
+	      <origin xyz="0 0 0" rpy="0 0 0"/>
+	      <parent link="chassis"/>
+	      <child link="left_caster_wheel"/>
+	      <axis xyz="0 1 0"/>
+     </joint> 
+
+    <link name='right_caster_wheel'>
+    	<collision>
+      	   <origin rpy="0 0 0" xyz="0.33884 0.27 0.075"/>
+      	    <geometry>
+      	        <sphere radius ="0.075"/>
+      	    </geometry>
+    	</collision>   
+     </link>
+     
+     <joint name="right_caster_joint" type="fixed">
+	      <origin xyz="0 0 0" rpy="0 0 0"/>
+	      <parent link="chassis"/>
+	      <child link="right_caster_wheel"/>
+	      <axis xyz="0 1 0"/>
+     </joint>   
+     
+    <gazebo reference="left_caster_wheel">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+    </gazebo>
+    <gazebo reference="right_caster_wheel">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+    </gazebo>
+    
+     
+  <!-- Back Wheels -->
+  
+    <link name='left_wheel'>
+    	<inertial>
+      	  <mass value="1.0"/>
+      	  <origin xyz="0.0 0.0 0.0"/>
+	  <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0" />
+    	</inertial>
+    
+    	<collision>
+      	   <origin rpy="1.57 0 0" xyz="0.0 0.0 0.0"/>
+      	    <geometry>
+      	        <cylinder radius="0.17" length="0.05"/>
+      	    </geometry>
+    	</collision>   
+     </link>
+     
+     <joint name="joint_left_wheel_chassis" type="continuous">
+    	<axis xyz="0 1 0"/>
+    	<origin xyz="-0.31 0.335 0.17" rpy="0 0 0"/>
+    	<parent link="chassis"/>
+    	<child link="left_wheel"/>
+	<dynamics damping="0.5"/>
+     </joint>
+     
+    <link name='right_wheel'>
+    	<inertial>
+      	  <mass value="1.0"/>
+      	  <origin xyz="0.0 0.0 0.0"/>
+	  <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0" />
+    	</inertial>
+    
+    	<collision>
+      	   <origin rpy="1.57 0 0" xyz="0.0 0.0 0.0"/>
+      	    <geometry>
+      	        <cylinder radius="0.17" length="0.05"/>
+      	    </geometry>
+    	</collision>   
+     </link>
+     
+     <joint name="joint_right_wheel_chassis" type="continuous">
+    	<axis xyz="0 1 0"/>
+    	<origin xyz="-0.31 -0.335 0.17" rpy="0 0 0"/>
+    	<parent link="chassis"/>
+    	<child link="right_wheel"/>
+	<dynamics damping="0.5"/>
+     </joint>
+     
+
+
+<!-- Camera Port -->
+ <link name="kinect">
+
+<visual>
+<origin xyz="0 0 0" rpy="0 0 0"/>
+<geometry>
+<mesh filename="package://slam/meshes/kinect.dae"/>
+</geometry>
+<material name="red"/>
+</visual>
+    
+
+<collision>
+<origin xyz="0 0 0" rpy="0 0 0"/>
+<geometry>
+<box size="0.1 0.1 0.1"/>
+</geometry>
+</collision>
+
+<inertial>
+<mass value="1e-5" />
+<origin xyz="0 0 0" rpy="0 0 0"/>
+<inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+</inertial>
+</link>
+
+
+	
+<joint name="joint_kinect_chassis" type="fixed">
+<origin xyz=".3 0 .4" rpy="0 0 0"/>
+<parent link="chassis"/>
+<child link="kinect"/>
+</joint>
+
+	
+<link name="kinect_link" />
+<joint name="joint_kinect_link" type="fixed">
+<origin xyz="0 0 0" rpy="-1.5707 0 -1.5707"/> <!-- To invert the coordinates from image convention (Z is forward) to normal xyz /-->
+<parent link="chassis"/>
+<child link="kinect_link"/>
+<visual>
+<origin xyz="0 0 0" rpy="0 0 0"/>
+</visual>
+</joint>
+ 
+    
+
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+         <legacyMode>false</legacyMode>
+         <alwaysOn>true</alwaysOn>
+         <updateRate>10</updateRate>
+         <leftJoint>joint_left_wheel_chassis</leftJoint>
+         <rightJoint>joint_right_wheel_chassis</rightJoint>
+         <wheelSeparation>0.6</wheelSeparation>
+         <wheelDiameter>0.34</wheelDiameter>
+         <wheelTorque>20</wheelTorque>
+         <!--wheelAcceleration>5</wheelAcceleration-->
+         <commandTopic>cmd_vel</commandTopic>
+         <odometryTopic>odom</odometryTopic>
+         <odometryFrame>odom</odometryFrame>
+         <publishTf>1</publishTf>
+         <publishWheelTF>True</publishWheelTF>
+         <publishWheelJointState>true</publishWheelJointState>
+         <robotBaseFrame>chassis</robotBaseFrame>
+    </plugin>
+  </gazebo>
+     
+
+    
+<!-- Plugin for Kinect sensor -->
+	  <gazebo reference="kinect">
+	    <sensor type="depth" name="camera1">
+		<always_on>1</always_on>
+		<visualize>true</visualize>             
+		<camera>
+		    <horizontal_fov>1.047</horizontal_fov>  
+		    <image>
+		        <width>640</width>
+		        <height>480</height>
+		        <format>R8G8B8</format>
+		    </image>
+		    <depth_camera>
+
+		    </depth_camera>
+		    <clip>
+		        <near>0.1</near>
+		        <far>100</far>
+		    </clip>
+		</camera>
+		     <plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
+		     <alwaysOn>true</alwaysOn>
+		        <updateRate>10.0</updateRate>
+		        <cameraName>kinect</cameraName>
+		        <frameName>kinect_link</frameName>                   
+		    <imageTopicName>rgb/image_raw</imageTopicName>
+		    <depthImageTopicName>depth/image_raw</depthImageTopicName>
+		    <pointCloudTopicName>depth/points</pointCloudTopicName>
+		    <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
+		    <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
+		    <pointCloudCutoff>0.4</pointCloudCutoff>                
+		        <hackBaseline>0.07</hackBaseline>
+		        <distortionK1>0.0</distortionK1>
+		        <distortionK2>0.0</distortionK2>
+		        <distortionK3>0.0</distortionK3>
+		        <distortionT1>0.0</distortionT1>
+		        <distortionT2>0.0</distortionT2>
+		    <CxPrime>0.0</CxPrime>
+		    <Cx>0.0</Cx>
+		    <Cy>0.0</Cy>
+		    <focalLength>0.0</focalLength>
+		    </plugin>
+	    </sensor>
+	  </gazebo>
+
+	<gazebo reference="kinect">
+  	<material>Gazebo/red</material>
+	</gazebo>
+  
+
+
+</robot>
+
